@@ -7,8 +7,8 @@
     "withGlobalTauri": false
   },
   "package": {
-    "productName": "serial-plotter2",
-    "version": "0.0.0"
+    "productName": "ya-serial-plotter",
+    "version": "0.1.0"
   },
   "tauri": {
     "allowlist": {
@@ -27,7 +27,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.owennewo.serial-plotter",
+      "identifier": "com.owennewo.ya-serial-plotter",
       "targets": "all"
     },
     "security": {
@@ -41,7 +41,7 @@
         "fullscreen": false,
         "resizable": true,
         "maximized": true,
-        "title": "serial-plotter2",
+        "title": "(Yet Another) Serial-Plotter",
         "width": 800,
         "height": 600
       }

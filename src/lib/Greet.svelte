@@ -2,12 +2,12 @@
   import { invoke } from "@tauri-apps/api/tauri"
 
   let name = "";
-  let greetMsg = ""
+  let scanMessage = ""
 
-  async function greet(){
+  async function scan(){
     // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    greetMsg = await invoke("list_ports")
-    console.log(greetMsg)
+    scanMessage = await invoke("list_ports")
+    console.log(scanMessage)
   }
 </script>
 
@@ -30,8 +30,8 @@
 
   <!-- 3rd column for the editor -->
   <div class="flex-grow bg-gray-200 p-4">
-    <button class="btn" on:click={greet}>Greet</button>
-    <p>{greetMsg}</p>
+    <button class="btn" on:click={scan}>Scan</button>
+    <p>{JSON.stringify(scanMessage)}</p>
   </div>
 </div>
 
