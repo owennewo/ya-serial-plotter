@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use std::io::{self};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
-use tauri::{CustomMenuItem, Menu, MenuItem, Submenu};
+use tauri::{CustomMenuItem, Menu, Submenu};
 
 #[tauri::command]
 fn list_ports() -> Vec<SerialPortInfo> {
@@ -35,6 +35,45 @@ fn disconnect(
 ) {
     ports.lock().unwrap().remove(port_name);
     println!("Port {} disconnected", port_name);
+}
+
+#[tauri::command]
+fn dummy(window: tauri::Window, numStreams: u32, samples_per_second: u64, period_in_millis: u64) {
+    // declare variable startTime and set it to the current time
+    let mut startTime = std::time::Instant::now();
+
+    std::thread::spawn(move || loop {
+        // sleep duration based on samples_per_second
+        std::thread::sleep(std::time::Duration::from_micros(
+            1_000_000 / samples_per_second,
+        ));
+        // declare variable now and set it to the current time
+        let now = std::time::Instant::now();
+        let elapsed = now.duration_since(startTime);
+
+        // create an array to store the sine values
+        let mut values = vec![0.0; numStreams as usize];
+        for i in 0..numStreams {
+            // generate sine waves with a phase shift proportional to the index
+            let period_in_secs = period_in_millis as f32 / 1000.0;
+            values[i as usize] = ((elapsed.as_secs_f32() * 2.0 * std::f32::consts::PI
+                / period_in_secs)
+                + ((i as f32) * 2.0 * std::f32::consts::PI / (numStreams as f32)))
+                .sin();
+        }
+
+        // create a string that contains the values of the sine waves to 2 decimal places that is terminated with a newline
+        let s = format!(
+            "{}\n",
+            values
+                .iter()
+                .map(|&x| format!("{:.2}", x))
+                .collect::<Vec<_>>()
+                .join(",")
+        );
+        // emit this string to bus-receive
+        window.emit("bus-receive", Some(s.as_bytes())).unwrap();
+    });
 }
 
 #[tauri::command]
@@ -95,6 +134,8 @@ fn connect(
 }
 
 fn main() {
+    println!("main");
+
     let ports: Arc<Mutex<HashMap<String, Arc<Mutex<Box<dyn SerialPort>>>>>> =
         Arc::new(Mutex::new(HashMap::new()));
 
@@ -102,8 +143,8 @@ fn main() {
     let close = CustomMenuItem::new("close".to_string(), "Close");
     let submenu = Submenu::new("File", Menu::new().add_item(quit).add_item(close));
     let menu = Menu::new()
-        .add_native_item(MenuItem::Copy)
-        .add_item(CustomMenuItem::new("hide", "Hide"))
+        // .add_native_item(MenuItem::Copy)
+        // .add_item(CustomMenuItem::new("hide", "Hide"))
         .add_submenu(submenu);
 
     println!("start");
@@ -120,7 +161,7 @@ fn main() {
         })
         .manage(ports)
         .invoke_handler(tauri::generate_handler![
-            list_ports, connect, disconnect, send
+            list_ports, connect, disconnect, send, dummy
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { listen } from "@tauri-apps/api/event";
+    import { listen, emit } from "@tauri-apps/api/event";
     import { invoke } from "@tauri-apps/api/tauri";
     import { selectedSerialPort } from "../stores/selection";
 
@@ -19,14 +19,12 @@
         }
     });
 
-    listen("bus-receive", (event) => {
+    listen("mux-stream", (event) => {
         // debugger;
-        const payload = event.payload as number[];
-        console.log("payload", payload);
+        // const payload = event.payload as number[];
+        // console.log("payload", payload);
 
-        receive_data = receive_data.concat(
-            payload.map((value: number) => String.fromCharCode(value)).join("")
-        );
+        receive_data = receive_data.concat(event.payload["text"]);
     });
 
     async function send() {

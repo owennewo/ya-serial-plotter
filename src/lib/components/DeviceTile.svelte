@@ -9,6 +9,11 @@
         invoke("connect", { portName: device.port_name, baudRate: 115200 });
         selectedSerialPort.set(device);
     };
+    const disconnect = () => {
+        console.log("Disconnecting to:", device.port_name);
+        invoke("disconnect", { portName: device.port_name });
+        selectedSerialPort.set(device);
+    };
 </script>
 
 <div class="card w-64 bg-base-100 shadow-xl">
@@ -47,6 +52,7 @@
             </div>
         </div>
         <button class="btn" on:click={connect}>Connect</button>
+        <button class="btn" on:click={disconnect}>disconnect</button>
     </div>
 </div>
 

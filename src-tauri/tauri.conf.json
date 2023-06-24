@@ -13,9 +13,22 @@
   "tauri": {
     "allowlist": {
       "all": false,
+      "dialog": {
+        "message": true
+      },
       "shell": {
         "all": false,
         "open": true
+      },
+      "fs": {
+        "all": true,
+        "scope": [
+          "$APPCONFIG/*",
+          "$APPDATA/*"
+        ]
+      },
+      "path": {
+        "all": true
       }
     },
     "bundle": {
